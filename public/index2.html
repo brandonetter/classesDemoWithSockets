@@ -1,0 +1,113 @@
+<script src="https://cdn.socket.io/4.5.0/socket.io.min.js" integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k" crossorigin="anonymous"></script>
+
+<script>
+
+    //FrontEnd logic is a bit hard-coded.
+    //We add an event listener for arrow keys and WASD
+
+    addEventListener('keydown', (event) => {
+        if("wasd".includes(event.key)){
+        socket.emit("moveKey",event.key);
+        }else
+        if("ArrowUpArrowLeftArrowRightArrowDown".includes(event.key)){
+        socket.emit("attackKey",event.key);
+        }
+    })
+
+    //connect to the socketServer and listen for Messages.
+    //All messages follow the same logic- the message is an object from one of the
+    //classes in the server- if that objects name exists as a DIV on the dom-> set it its position based on the update;
+    // if that objects name does not exits-> create a div and add it to the dom.
+    const socket = io();
+    socket.on("roomExit",(msg)=>{
+        for(let i of msg){
+            if(!document.getElementById(i.name)){
+                document.body.innerHTML+=`<div id="${i.name}" style="position:absolute">🔀</div>`;
+
+            }
+            if(i.name == 0){
+            document.getElementById(i.name).style.top = i.exitPos[1]*10+200;
+            document.getElementById(i.name).style.left = i.exitPos[0]*10+200;
+            }
+            if(i.name == 1){
+            document.getElementById(i.name).style.top = i.exitPos[1]*10+200;
+            document.getElementById(i.name).style.left = i.exitPos[0]*10+420;
+            }
+
+        }
+    });
+    socket.on("users",(msg)=>{
+        for(let i of msg){
+            if(!document.getElementById(i.userID)){
+                document.body.innerHTML+=`<div id="${i.userID}" style="position:absolute">😀</div>`;
+
+            }
+            if(i.room == 0){
+            document.getElementById(i.userID).style.top = i.position[1]*10+200;
+            document.getElementById(i.userID).style.left = i.position[0]*10+200;
+            }
+            if(i.room == 1){
+            document.getElementById(i.userID).style.top = i.position[1]*10+200;
+            document.getElementById(i.userID).style.left = i.position[0]*10+420;
+            }
+
+        }
+    });
+    socket.on("removeDead",(msg)=>{
+            if(document.getElementById(msg)){
+                document.getElementById(msg).innerHTML="💀";
+                setTimeout(()=>{
+                    document.getElementById(msg).remove();
+                },2000);
+
+            }
+        })
+    socket.on("attacks",(msg)=>{
+        for(let i of msg){
+            if(!document.getElementById(i.name)){
+                document.body.innerHTML+=`<div id="${i.name}" style="position:absolute">💥</div>`;
+                setTimeout(()=>{
+                    document.getElementById(i.name).remove();
+                },200);
+            }
+            document.getElementById(i.name).style.top = i.position[1]*10+200;
+            document.getElementById(i.name).style.left = i.position[0]*10+200;
+        }
+    });
+
+    socket.on("move",(msg)=>{
+        for(let i of msg){
+            if(!document.getElementById(i.name)){
+                document.body.innerHTML+=`<div id="${i.name}" style="position:absolute">👺</div>`;
+            }
+            document.getElementById(i.name).style.top = i.position[1]*10+200;
+            document.getElementById(i.name).style.left = i.position[0]*10+200;
+
+        }
+    })
+  </script>
+  <div class ="room1"> </div>
+  <div class ="room2"> </div>
+
+  <style>
+    .room1{
+        background-color: green;
+        position: absolute;
+        top:100;
+        left:100;
+        width:220px;
+        height:220px;
+        border-style: solid;
+    }
+    .room2{
+        background-color: darkgreen;
+        position: absolute;
+        top:100;
+        left:320;
+        width:220px;
+        height:220px;
+        border-style: solid;
+    }
+
+  </style>
+
