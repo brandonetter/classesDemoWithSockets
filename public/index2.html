@@ -37,21 +37,33 @@
         }
     });
     socket.on("users",(msg)=>{
+        const users = document.querySelectorAll(`[id^="user"]`);
         for(let i of msg){
-            if(!document.getElementById(i.userID)){
-                document.body.innerHTML+=`<div id="${i.userID}" style="position:absolute">😀</div>`;
+            if(!document.getElementById("user"+i.userID)){
+                document.body.innerHTML+=`<div id="${"user"+i.userID}" style="position:absolute">😀</div>`;
 
             }
             if(i.room == 0){
-            document.getElementById(i.userID).style.top = i.position[1]*10+200;
-            document.getElementById(i.userID).style.left = i.position[0]*10+200;
+            document.getElementById("user"+i.userID).style.top = i.position[1]*10+200;
+            document.getElementById("user"+i.userID).style.left = i.position[0]*10+200;
             }
             if(i.room == 1){
-            document.getElementById(i.userID).style.top = i.position[1]*10+200;
-            document.getElementById(i.userID).style.left = i.position[0]*10+420;
+            document.getElementById("user"+i.userID).style.top = i.position[1]*10+200;
+            document.getElementById("user"+i.userID).style.left = i.position[0]*10+420;
             }
 
         }
+        for(let i of users){
+            let keep = 0;
+            for(let j of msg){
+                if(i.id === "user"+j.userID) keep =1;
+
+            }
+            if(keep === 0){
+                i.remove();
+            }
+        }
+
     });
     socket.on("removeDead",(msg)=>{
             if(document.getElementById(msg)){
